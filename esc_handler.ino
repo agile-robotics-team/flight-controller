@@ -12,7 +12,7 @@ void initEscDriver(){
   TIMER4_BASE->ARR = 20000;
   TIMER4_BASE->DCR = 0;
 
-  // change this drivers between 1000-2000 for drive esc
+  // change this registers between 1000-2000 for drive esc
   TIMER4_BASE->CCR1 = 1000;
   TIMER4_BASE->CCR2 = 1000;
   TIMER4_BASE->CCR3 = 1000;
