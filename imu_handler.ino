@@ -72,26 +72,27 @@ void calibrateGyro(){
 }
 
 void initIMU() {
-  //Awake the MPU6050 sensor from sleep mode (+/-8g)
-  HWire.beginTransmission(MPU6050_ADDRESS);                             //Start communicating with the MPU-6050
-  HWire.write(0x6B);                                                    //Send the requested starting register
-  HWire.write(0x00);                                                    //Set the requested starting register
-  HWire.endTransmission();                                              //End the transmission
+  //Awake the MPU6050 sensor from sleep mode
+  HWire.beginTransmission(MPU6050_ADDRESS);                             
+  HWire.write(0x6B);                                                   
+  HWire.write(0x00);                                                   
+  HWire.endTransmission();                                      
   
   //Configure the accelerometer (+/-8g)
-  HWire.beginTransmission(MPU6050_ADDRESS);                              //Start communicating with the MPU-6050
-  HWire.write(0x1C);                                                    //Send the requested starting register
-  HWire.write(0x10);                                                    //Set the requested starting register
-  HWire.endTransmission();                                              //End the transmission
+  HWire.beginTransmission(MPU6050_ADDRESS);                           
+  HWire.write(0x1C);                                                    
+  HWire.write(0x10);                                                  
+  HWire.endTransmission();                                             
   
   //Configure the gyro (500dps full scale)
-  HWire.beginTransmission(MPU6050_ADDRESS);                             //Start communicating with the MPU-6050
-  HWire.write(0x1B);                                                    //Send the requested starting register
-  HWire.write(0x08);                                                    //Set the requested starting register
+  HWire.beginTransmission(MPU6050_ADDRESS);                           
+  HWire.write(0x1B);                                                   
+  HWire.write(0x08);                                              
   HWire.endTransmission();
-
-  HWire.beginTransmission(MPU6050_ADDRESS);                             //Start communication with the MPU-6050.
-  HWire.write(0x1A);                                                    //We want to write to the CONFIG register (1A hex).
-  HWire.write(0x03);                                                    //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz).
+  
+  //Set Digital Low Pass Filter to ~43Hz
+  HWire.beginTransmission(MPU6050_ADDRESS);                             
+  HWire.write(0x1A);                                                    
+  HWire.write(0x03);                                                    
   HWire.endTransmission();
 }
