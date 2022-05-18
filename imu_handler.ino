@@ -1,18 +1,3 @@
-int16_t gyro_x_raw, gyro_y_raw, gyro_z_raw;
-long gyro_x_cal, gyro_y_cal, gyro_z_cal;
-float gyro_x, gyro_y, gyro_z;
-int16_t acc_x, acc_y, acc_z;
-int16_t temperature_raw;
-float temperature;
-
-long acc_total_vector;
-float angle_pitch = 0, angle_roll = 0;
-float angle_roll_acc, angle_pitch_acc;
-float angle_pitch_output, angle_roll_output;
-
-const uint8_t MPU6050_ADDRESS = 0x68;
-const uint8_t MPU6050_READ_ADDRESS = 0x3B;
-
 void calcAngles(){
   readIMU();
   calcGyro();
@@ -69,6 +54,13 @@ void calibrateGyro(){
   gyro_x_cal /= 2000;                                                  
   gyro_y_cal /= 2000;                                                  
   gyro_z_cal /= 2000;
+  Serial.print(gyro_x_cal);
+  Serial.print("\t");
+  Serial.print(gyro_y_cal);
+  Serial.print("\t");
+  Serial.print(gyro_z_cal);
+  Serial.print("\t");
+  
 }
 
 void initIMU() {
