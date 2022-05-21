@@ -1,6 +1,9 @@
 void calcAngles(){
   readIMU();
-  calcGyro();
+  
+  gyro_x = gyro_x_raw - gyro_x_cal;
+  gyro_y = gyro_y_raw - gyro_y_cal;
+  gyro_z = gyro_z_raw - gyro_z_cal;
   
   angle_pitch += gyro_x * 0.0000611;
   angle_roll  += gyro_y * 0.0000611;            
@@ -8,20 +11,17 @@ void calcAngles(){
   angle_roll -= angle_pitch * sin(gyro_z * 0.000001066);
   
   acc_total_vector = sqrt((acc_x*acc_x)+(acc_y*acc_y)+(acc_z*acc_z));
+  
   angle_pitch_acc = asin((float)acc_y/acc_total_vector)*  57.296;
   angle_roll_acc  = asin((float)acc_x/acc_total_vector)* -57.296;
 
+  // fix drift
   angle_pitch = angle_pitch * 0.95 + angle_pitch_acc * 0.05;     
-  angle_roll = angle_roll * 0.95 + angle_roll_acc * 0.05;  
+  angle_roll  = angle_roll  * 0.95 + angle_roll_acc  * 0.05; 
 
-  angle_pitch_output = angle_pitch_acc * 0.8 + angle_pitch * 0.2;  
-  angle_roll_output = angle_roll_acc * 0.8 + angle_roll * 0.2; 
-}
-
-void calcGyro() {
-  gyro_x = gyro_x_raw - gyro_x_cal;
-  gyro_y = gyro_y_raw - gyro_y_cal;
-  gyro_z = gyro_z_raw - gyro_z_cal;
+  angle_pitch_output = kalmanX.update(angle_pitch_acc, angle_pitch);
+  if(angle_pitch_output>=90) angle_pitch_output = 90;
+  else if (angle_pitch_output<=-90) angle_pitch_output = -90;
 }
 
 void calcTemprature() {
