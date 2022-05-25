@@ -22,6 +22,10 @@ void calcAngles(){
   angle_pitch_output = kalmanX.update(angle_pitch_acc, angle_pitch);
   if(angle_pitch_output>=90) angle_pitch_output = 90;
   else if (angle_pitch_output<=-90) angle_pitch_output = -90;
+
+  angle_roll_output = kalmanY.update(angle_roll_acc, angle_roll) - 0.70;
+  if(angle_roll_output>=90) angle_roll_output = 90;
+  else if (angle_roll_output<=-90) angle_roll_output = -90;
 }
 
 void calcTemprature() {
@@ -44,7 +48,7 @@ void readIMU() {
 
 void calibrateGyro(){                                              
   for (int cal_int = 0; cal_int < 2000 ; cal_int ++){                  
-    if(cal_int % 100 == 0) Serial.print(".");                            
+    if(cal_int % 100 == 0) Serial.println(".");                            
     readIMU();                                             
     gyro_x_cal += gyro_x_raw;                                           
     gyro_y_cal += gyro_y_raw;                                              
@@ -54,12 +58,12 @@ void calibrateGyro(){
   gyro_x_cal /= 2000;                                                  
   gyro_y_cal /= 2000;                                                  
   gyro_z_cal /= 2000;
-  Serial.print(gyro_x_cal);
-  Serial.print("\t");
-  Serial.print(gyro_y_cal);
-  Serial.print("\t");
-  Serial.print(gyro_z_cal);
-  Serial.print("\t");
+  //Serial.print(gyro_x_cal);
+  //Serial.print("\t");
+  //Serial.print(gyro_y_cal);
+  //Serial.print("\t");
+  //Serial.print(gyro_z_cal);
+  //Serial.print("\t");
   
 }
 
