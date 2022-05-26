@@ -29,7 +29,13 @@ void serialHandler() {
         esc_4 = 1000;
         }
       }
-      
+
+    // GET MODE
+    else if(serial_rx_buffer[0] == 'G' && serial_rx_buffer[1] == 'M'){
+      Serial.print("{\"GM\":");
+      Serial.print(loop_status);
+      Serial.println("}"); }
+    
     // GET ANGLES
     else if(serial_rx_buffer[0] == 'P' && serial_rx_buffer[1] == 'D'){
       Serial.print("{\"PD\":");
@@ -86,10 +92,10 @@ void serialHandler() {
       
     // THIS LINES NEEDS DEBUG MODE
     // ESC SET
-    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '1' && loop_status == 2) esc_1 = atoi(get_value_char(serial_rx_buffer));
-    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '2' && loop_status == 2) esc_2 = atoi(get_value_char(serial_rx_buffer));
-    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '3' && loop_status == 2) esc_3 = atoi(get_value_char(serial_rx_buffer));
-    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '4' && loop_status == 2) esc_4 = atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '1' && loop_status == 2) esc_1 = 1000 + atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '2' && loop_status == 2) esc_2 = 1000 + atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '3' && loop_status == 2) esc_3 = 1000 + atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'E' && serial_rx_buffer[1] == '4' && loop_status == 2) esc_4 = 1000 + atoi(get_value_char(serial_rx_buffer));
 
     // RETURN ERRORS BACK
     else Serial.println(serial_rx_buffer);

@@ -75,10 +75,15 @@ void loop() {
     calcPid();  
     esc_1 = 1100 + 125 - pid_output_pitch;
     esc_2 = 1100 + 125 + pid_output_pitch;
+    
     if (esc_1 < 1100) esc_1 = 1100;
     if (esc_2 < 1100) esc_2 = 1100;
+    if (esc_3 < 1100) esc_3 = 1100;
+    if (esc_4 < 1100) esc_4 = 1100;
     if (esc_1 > 1500) esc_1 = 1500;
-    if (esc_2 > 1500) esc_2 = 1500;}
+    if (esc_2 > 1500) esc_2 = 1500; 
+    if (esc_3 > 1500) esc_3 = 1500;
+    if (esc_4 > 1500) esc_4 = 1500;}
 
   // DEBUG MODE
   else if(loop_status == 2){
@@ -86,7 +91,7 @@ void loop() {
       digitalWrite(PC13, !digitalRead(PC13));
       mode_blinker = 0;}
 
-    if (debug_mode_delay++ > 5){ 
+    if (debug_mode_delay++ > 3){ 
       Serial.print("{\"PD\":");
       Serial.print(angle_pitch_output);
       Serial.print(",\"RD\":");
@@ -96,9 +101,12 @@ void loop() {
       
     if (esc_1 < 1000) esc_1 = 1000;
     if (esc_2 < 1000) esc_2 = 1000;
-    if (esc_1 > 1200) esc_1 = 1200;
-    if (esc_2 > 1200) esc_2 = 1200;
-      
+    if (esc_3 < 1000) esc_3 = 1000;
+    if (esc_4 < 1000) esc_4 = 1000;
+    if (esc_1 > 2000) esc_1 = 2000;
+    if (esc_2 > 2000) esc_2 = 2000; 
+    if (esc_3 > 2000) esc_3 = 2000;
+    if (esc_4 > 2000) esc_4 = 2000;
 
     }
 
