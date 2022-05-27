@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <EEPROM.h>
 #include "KalmanFilter.h"
 
 TwoWire HWire(2, I2C_FAST_MODE);
@@ -18,19 +19,21 @@ int     debug_mode_delay = 0;
 long  acc_total_vector;
 float angle_pitch = 0, angle_roll = 0;
 float angle_roll_acc, angle_pitch_acc;
-float angle_pitch_output, angle_roll_output;
+float angle_pitch_output, angle_roll_output, angle_yaw_output;
 
 float pid_error_temp;
 float pid_i_mem_pitch, pid_pitch_setpoint = 0, gyro_pitch_input, pid_output_pitch, pid_last_pitch_d_error;
-float pid_p_gain_pitch = 0.61; //Gain setting for the pitch P-controller.
-float pid_i_gain_pitch = 0.00018; //Gain setting for the pitch I-controller.
-float pid_d_gain_pitch = 100; //Gain setting for the pitch D-controller.
-int   pid_max_pitch =  500; //Maximum output of the PID-controller (+/-).
 float pid_i_mem_roll, pid_roll_setpoint = 0, gyro_roll_input, pid_output_roll, pid_last_roll_d_error;
-float pid_p_gain_roll = 0.61; //Gain setting for the pitch P-controller.
-float pid_i_gain_roll = 0.00018; //Gain setting for the pitch I-controller.
-float pid_d_gain_roll = 100; //Gain setting for the pitch D-controller.
-int   pid_max_roll =  500; //Maximum output of the PID-controller (+/-).
+
+float pid_p_gain_pitch = EEPROM.read(0) / 100;
+float pid_i_gain_pitch = EEPROM.read(1) / 100000;
+float pid_d_gain_pitch = EEPROM.read(2);
+float pid_p_gain_roll  = EEPROM.read(3) / 100;
+float pid_i_gain_roll  = EEPROM.read(4) / 100000;
+float pid_d_gain_roll  = EEPROM.read(5);
+
+int   pid_max_roll  =  500; //Maximum output of the PID-controller (+/-).
+int   pid_max_pitch =  500; //Maximum output of the PID-controller (+/-).
 
 const uint8_t MPU6050_ADDRESS = 0x68;
 const uint8_t MPU6050_READ_ADDRESS = 0x3B;
@@ -68,6 +71,7 @@ void loop() {
   // PREPARING SYSTEM
   TIMER4_BASE->ARR = 5000;
   serialHandler();
+  serialLinkHandler();
   calcAngles();
 
   // STABILIZE MODE
@@ -84,32 +88,7 @@ void loop() {
     if (esc_2 > 1500) esc_2 = 1500; 
     if (esc_3 > 1500) esc_3 = 1500;
     if (esc_4 > 1500) esc_4 = 1500;}
-
-  // DEBUG MODE
-  else if(loop_status == 2){
-    if (mode_blinker++ > 125){ 
-      digitalWrite(PC13, !digitalRead(PC13));
-      mode_blinker = 0;}
-
-    if (debug_mode_delay++ > 3){ 
-      Serial.print("{\"PD\":");
-      Serial.print(angle_pitch_output);
-      Serial.print(",\"RD\":");
-      Serial.print(angle_roll_output);
-      Serial.println("}");
-      debug_mode_delay = 0;}
-      
-    if (esc_1 < 1000) esc_1 = 1000;
-    if (esc_2 < 1000) esc_2 = 1000;
-    if (esc_3 < 1000) esc_3 = 1000;
-    if (esc_4 < 1000) esc_4 = 1000;
-    if (esc_1 > 2000) esc_1 = 2000;
-    if (esc_2 > 2000) esc_2 = 2000; 
-    if (esc_3 > 2000) esc_3 = 2000;
-    if (esc_4 > 2000) esc_4 = 2000;
-
-    }
-
+     
   // BOOT MODE
   else {
     esc_1 = 1000;
@@ -125,5 +104,4 @@ void loop() {
   
   while (loop_timer > micros());
   loop_timer = micros() + 4000;
-  
 }

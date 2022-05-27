@@ -4,6 +4,8 @@ void calcAngles(){
   gyro_x = gyro_x_raw - gyro_x_cal;
   gyro_y = gyro_y_raw - gyro_y_cal;
   gyro_z = gyro_z_raw - gyro_z_cal;
+
+  angle_yaw_output = (angle_yaw_output * 0.7) + (((float)gyro_z / 65.5) * 0.3);      //Gyro pid input is deg/sec.
   
   angle_pitch += gyro_x * 0.0000611;
   angle_roll  += gyro_y * 0.0000611;            
