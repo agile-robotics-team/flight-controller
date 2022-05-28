@@ -21,6 +21,12 @@ void serialHandler() {
         esc_2 = 1100;
         esc_3 = 1100;
         esc_4 = 1100;
+        pid_p_gain_pitch = EEPROM.read(0) / 100.0;
+        pid_i_gain_pitch = EEPROM.read(1) / 100000.0;
+        pid_d_gain_pitch = EEPROM.read(2);
+        pid_p_gain_roll  = EEPROM.read(3) / 100.0;
+        pid_i_gain_roll  = EEPROM.read(4) / 100000.0;
+        pid_d_gain_roll  = EEPROM.read(5);
         }
        else{
         esc_1 = 1000;
@@ -103,11 +109,11 @@ void serialHandler() {
     // EEPROM WRITE PID
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'P' && loop_status == 2){
       EEPROM.write(0, atoi(get_value_char(serial_rx_buffer)));
-      pid_p_gain_pitch = (float)(EEPROM.read(0) / 100);
+      pid_p_gain_pitch = (float)(EEPROM.read(0) / 100.0);
       }
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'I' && loop_status == 2){
       EEPROM.write(1, atoi(get_value_char(serial_rx_buffer)));
-      pid_i_gain_pitch = (float)(EEPROM.read(1) / 100000);
+      pid_i_gain_pitch = (float)(EEPROM.read(1) / 100000.0);
       }
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'D' && loop_status == 2){
       EEPROM.write(2, atoi(get_value_char(serial_rx_buffer)));
@@ -115,15 +121,15 @@ void serialHandler() {
       }
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'P' && loop_status == 2){
       EEPROM.write(3, atoi(get_value_char(serial_rx_buffer)));
-      pid_p_gain_roll = (float)(EEPROM.read(3) / 100);
+      pid_p_gain_roll = (float)(EEPROM.read(3) / 100.0);
       }
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'I' && loop_status == 2){
       EEPROM.write(4, atoi(get_value_char(serial_rx_buffer)));
-      pid_i_gain_roll = (float)(EEPROM.read(4) / 100);
+      pid_i_gain_roll = (float)(EEPROM.read(4) / 100000.0);
       }
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'D' && loop_status == 2){
       EEPROM.write(5, atoi(get_value_char(serial_rx_buffer)));
-      pid_d_gain_roll = (float)(EEPROM.read(5) / 100);
+      pid_d_gain_roll = (float)(EEPROM.read(5));
       }
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'P' && loop_status == 2) EEPROM.write(6, atoi(get_value_char(serial_rx_buffer)));
     else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'I' && loop_status == 2) EEPROM.write(7, atoi(get_value_char(serial_rx_buffer)));

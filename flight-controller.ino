@@ -23,17 +23,13 @@ float angle_pitch_output, angle_roll_output, angle_yaw_output;
 
 float pid_error_temp;
 float pid_i_mem_pitch, pid_pitch_setpoint = 0, gyro_pitch_input, pid_output_pitch, pid_last_pitch_d_error;
-float pid_i_mem_roll, pid_roll_setpoint = 0, gyro_roll_input, pid_output_roll, pid_last_roll_d_error;
+float pid_i_mem_roll,  pid_roll_setpoint = 0,  gyro_roll_input,  pid_output_roll,  pid_last_roll_d_error;
 
-float pid_p_gain_pitch = EEPROM.read(0) / 100;
-float pid_i_gain_pitch = EEPROM.read(1) / 100000;
-float pid_d_gain_pitch = EEPROM.read(2);
-float pid_p_gain_roll  = EEPROM.read(3) / 100;
-float pid_i_gain_roll  = EEPROM.read(4) / 100000;
-float pid_d_gain_roll  = EEPROM.read(5);
+double pid_p_gain_pitch, pid_i_gain_pitch, pid_d_gain_pitch;
+double pid_p_gain_roll, pid_i_gain_roll,pid_d_gain_roll;
 
-int   pid_max_roll  =  500; //Maximum output of the PID-controller (+/-).
-int   pid_max_pitch =  500; //Maximum output of the PID-controller (+/-).
+int   pid_max_roll  =  400; //Maximum output of the PID-controller (+/-).
+int   pid_max_pitch =  400; //Maximum output of the PID-controller (+/-).
 
 const uint8_t MPU6050_ADDRESS = 0x68;
 const uint8_t MPU6050_READ_ADDRESS = 0x3B;
@@ -41,11 +37,16 @@ int           esc_1 = 1000, esc_2 = 1000, esc_3 = 1000, esc_4 = 1000;
 
 KalmanFilter kalmanX(0.001, 0.003, 0.03);
 KalmanFilter kalmanY(0.001, 0.003, 0.03);
-float kalPitch = 0;
-float kalRoll = 0;
 
 void setup() {
   // init communcation ways
+  pid_p_gain_pitch = EEPROM.read(0) / 100.0;
+  pid_i_gain_pitch = EEPROM.read(1) / 100000.0;
+  pid_d_gain_pitch = EEPROM.read(2);
+  pid_p_gain_roll  = EEPROM.read(3) / 100.0;
+  pid_i_gain_roll  = EEPROM.read(4) / 100000.0;
+  pid_d_gain_roll  = EEPROM.read(5);
+  
   pinMode(PC13, OUTPUT);
   
   Serial.begin(115200);
@@ -77,8 +78,26 @@ void loop() {
   // STABILIZE MODE
   if(loop_status == 1){
     calcPid();  
-    esc_1 = 1100 + 125 - pid_output_pitch;
-    esc_2 = 1100 + 125 + pid_output_pitch;
+    esc_1 = 150 - pid_output_pitch + pid_output_roll;
+    esc_2 = 150 + pid_output_pitch + pid_output_roll;
+    esc_3 = 150 + pid_output_pitch - pid_output_roll;
+    esc_4 = 150 - pid_output_pitch - pid_output_roll; 
+
+    if (debug_mode_delay++ > 2){ 
+      Serial.print("{\"PD\":");
+      Serial.print(angle_pitch_output);
+      Serial.print(",\"RD\":");
+      Serial.print(angle_roll_output);
+      Serial.print(",\"ESC1\":");
+      Serial.print(esc_1);
+      Serial.print(",\"ESC2\":");
+      Serial.print(esc_2);
+      Serial.print(",\"ESC3\":");
+      Serial.print(esc_3);
+      Serial.print(",\"ESC4\":");
+      Serial.print(esc_4);
+      Serial.println("}");
+      debug_mode_delay = 0;}
     
     if (esc_1 < 1100) esc_1 = 1100;
     if (esc_2 < 1100) esc_2 = 1100;
@@ -88,7 +107,18 @@ void loop() {
     if (esc_2 > 1500) esc_2 = 1500; 
     if (esc_3 > 1500) esc_3 = 1500;
     if (esc_4 > 1500) esc_4 = 1500;}
-     
+
+  else if(loop_status == 4){
+    Serial.print(pid_p_gain_pitch);
+    Serial.print("\t");
+    Serial.print(pid_d_gain_pitch);
+    Serial.print("\t");
+    Serial.println(pid_i_gain_pitch*100000);
+    }
+
+  // SKIP IF OTHER MODES
+  else if(loop_status == 2 || loop_status == 3);
+  
   // BOOT MODE
   else {
     esc_1 = 1000;
