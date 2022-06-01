@@ -50,7 +50,7 @@ void readIMU() {
 
 void calibrateGyro(){                                              
   for (int cal_int = 0; cal_int < 2000 ; cal_int ++){                  
-    if(cal_int % 100 == 0) Serial.println(".");                            
+    if(cal_int % 100 == 0) Serial1.println(".");                            
     readIMU();                                             
     gyro_x_cal += gyro_x_raw;                                           
     gyro_y_cal += gyro_y_raw;                                              

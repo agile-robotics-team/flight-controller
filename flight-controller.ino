@@ -2,8 +2,6 @@
 #include <EEPROM.h>
 #include "KalmanFilter.h"
 
-TwoWire HWire(2, I2C_FAST_MODE);
-
 int     loop_timer, val;
 int16_t gyro_x_raw, gyro_y_raw, gyro_z_raw;
 long    gyro_x_cal, gyro_y_cal, gyro_z_cal;
@@ -38,26 +36,33 @@ int           esc_1 = 1000, esc_2 = 1000, esc_3 = 1000, esc_4 = 1000;
 KalmanFilter kalmanX(0.001, 0.003, 0.03);
 KalmanFilter kalmanY(0.001, 0.003, 0.03);
 
+// receiver control
+volatile int channels[18];
+TwoWire HWire(PB7, PB6);
+
 void setup() {
   // init communcation ways
-  pid_p_gain_pitch = EEPROM.read(0) / 100.0;
-  pid_i_gain_pitch = EEPROM.read(1) / 100000.0;
-  pid_d_gain_pitch = EEPROM.read(2);
-  pid_p_gain_roll  = EEPROM.read(3) / 100.0;
-  pid_i_gain_roll  = EEPROM.read(4) / 100000.0;
-  pid_d_gain_roll  = EEPROM.read(5);
   
   pinMode(PC13, OUTPUT);
-  
+
   Serial.begin(115200);
+  Serial.println("Serial1 Başlatıldı.");
+
+  
   HWire.setClock(400000);
   HWire.begin();
   delay(250);
+  Serial.println("Wire Başlatıldı.");
+  delay(250);
 
   // init drivers
+  Serial.println("Başlatılıyor...");
   initIMU();
+  Serial.println("IMU Başlatıldı.");
   initEscDriver();
+  Serial.println("ESC'ler Başlatıldı.");
   calibrateGyro();
+  Serial.println("Gyro kalibre edildi.");
   digitalWrite(PC13, HIGH);
   
   //delay(3000);
@@ -70,11 +75,11 @@ void setup() {
 void loop() {
 
   // PREPARING SYSTEM
-  TIMER4_BASE->ARR = 5000;
   serialHandler();
   serialLinkHandler();
   calcAngles();
-
+  // sbusProcess();
+  
   // STABILIZE MODE
   if(loop_status == 1){
     calcPid();  
@@ -127,10 +132,14 @@ void loop() {
     esc_4 = 1000;}
 
   // EMITTING ESC SIGNALS
-  TIMER4_BASE -> CCR1 = esc_1;
-  TIMER4_BASE -> CCR2 = esc_2;
-  TIMER4_BASE -> CCR3 = esc_3;
-  TIMER4_BASE -> CCR4 = esc_4;
+  esc_1 = map(esc_1, 0, 255, 0, 1000);
+  esc_2 = map(esc_2, 0, 255, 0, 1000);
+  esc_3 = map(esc_3, 0, 255, 0, 1000);
+  esc_4 = map(esc_4, 0, 255, 0, 1000);
+  analogWrite(D12, esc_1); 
+  analogWrite(D13, esc_2);
+  analogWrite(D14, esc_3); 
+  analogWrite(D15, esc_4);
   
   while (loop_timer > micros());
   loop_timer = micros() + 4000;
