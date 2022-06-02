@@ -36,49 +36,47 @@ int           esc_1 = 1000, esc_2 = 1000, esc_3 = 1000, esc_4 = 1000;
 KalmanFilter kalmanX(0.001, 0.003, 0.03);
 KalmanFilter kalmanY(0.001, 0.003, 0.03);
 
+TwoWire HWire(2, I2C_FAST_MODE);
+
 // receiver control
 volatile int channels[18];
-TwoWire HWire(PB7, PB6);
 
 void setup() {
+  
   // init communcation ways
-  
   pinMode(PC13, OUTPUT);
-
+  Serial2.begin(100000, SERIAL_8E2);
   Serial.begin(115200);
-  Serial.println("Serial1 Başlatıldı.");
-
-  
+  while(!Serial);
   HWire.setClock(400000);
   HWire.begin();
-  delay(250);
-  Serial.println("Wire Başlatıldı.");
-  delay(250);
+  delay(50);
 
   // init drivers
-  Serial.println("Başlatılıyor...");
   initIMU();
-  Serial.println("IMU Başlatıldı.");
   initEscDriver();
-  Serial.println("ESC'ler Başlatıldı.");
   calibrateGyro();
-  Serial.println("Gyro kalibre edildi.");
   digitalWrite(PC13, HIGH);
   
   //delay(3000);
   //gyro_x_cal= -5371;
   //gyro_y_cal= -258;
   //gyro_z_cal= -102;
-       
-}
+  
+  pid_p_gain_pitch = EEPROM.read(0) / 100.0;
+  pid_i_gain_pitch = EEPROM.read(1) / 100000.0;
+  pid_d_gain_pitch = EEPROM.read(2);
+  pid_p_gain_roll  = EEPROM.read(3) / 100.0;
+  pid_i_gain_roll  = EEPROM.read(4) / 100000.0;
+  pid_d_gain_roll  = EEPROM.read(5);}
 
 void loop() {
 
-  // PREPARING SYSTEM
+  // PREPARING SYSTEM FOR CURRENT LOOP
   serialHandler();
   serialLinkHandler();
   calcAngles();
-  // sbusProcess();
+  sbusProcess();
   
   // STABILIZE MODE
   if(loop_status == 1){
@@ -114,11 +112,23 @@ void loop() {
     if (esc_4 > 1500) esc_4 = 1500;}
 
   else if(loop_status == 4){
-    Serial.print(pid_p_gain_pitch);
-    Serial.print("\t");
-    Serial.print(pid_d_gain_pitch);
-    Serial.print("\t");
-    Serial.println(pid_i_gain_pitch*100000);
+      Serial.print("{\"CH1\":");
+      Serial.print(channels[0]);
+      Serial.print(",\"CH2\":");
+      Serial.print(channels[1]);
+      Serial.print(",\"CH3\":");
+      Serial.print(channels[2]);
+      Serial.print(",\"CH4\":");
+      Serial.print(channels[3]);
+      Serial.print(",\"CH5\":");
+      Serial.print(channels[4]);
+      Serial.print(",\"CH6\":");
+      Serial.print(channels[5]);
+      Serial.print(",\"CH7\":");
+      Serial.print(channels[6]);
+      Serial.print(",\"CH8\":");
+      Serial.print(channels[7]);
+      Serial.println("}");
     }
 
   // SKIP IF OTHER MODES
@@ -132,15 +142,11 @@ void loop() {
     esc_4 = 1000;}
 
   // EMITTING ESC SIGNALS
-  esc_1 = map(esc_1, 0, 255, 0, 1000);
-  esc_2 = map(esc_2, 0, 255, 0, 1000);
-  esc_3 = map(esc_3, 0, 255, 0, 1000);
-  esc_4 = map(esc_4, 0, 255, 0, 1000);
-  analogWrite(D12, esc_1); 
-  analogWrite(D13, esc_2);
-  analogWrite(D14, esc_3); 
-  analogWrite(D15, esc_4);
-  
+  TIMER4_BASE->CCR1 = 1000 + esc_1;
+  TIMER4_BASE->CCR1 = 1000 + esc_2;
+  TIMER4_BASE->CCR1 = 1000 + esc_3;
+  TIMER4_BASE->CCR1 = 1000 + esc_4;
+ 
   while (loop_timer > micros());
   loop_timer = micros() + 4000;
 }

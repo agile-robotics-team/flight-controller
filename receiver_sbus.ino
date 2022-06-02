@@ -5,30 +5,30 @@
   
   sbusProcess();
   
-  Serial1.print(channels[0]);
-  Serial1.print("\t");
-  Serial1.print(channels[1]);
-  Serial1.print("\t");
-  Serial1.print(channels[2]);
-  Serial1.print("\t");
-  Serial1.print(channels[3]);
-  Serial1.print("\t");
-  Serial1.print(channels[4]);
-  Serial1.print("\t");
-  Serial1.print(channels[5]);
-  Serial1.print("\t");
-  Serial1.print(channels[6]);
-  Serial1.print("\t");
-  Serial1.print(channels[7]);
-  Serial1.print("\t");
-  Serial1.print(channels[8]);
-  Serial1.print("\t");
-  Serial1.print(channels[9]);
-  Serial1.print("\t");
-  Serial1.print(channels[11]);
-  Serial1.print("\t");
-  Serial1.println(channels[12]);
-}
+  Serial.print(channels[0]);
+  Serial.print("\t");
+  Serial.print(channels[1]);
+  Serial.print("\t");
+  Serial.print(channels[2]);
+  Serial.print("\t");
+  Serial.print(channels[3]);
+  Serial.print("\t");
+  Serial.print(channels[4]);
+  Serial.print("\t");
+  Serial.print(channels[5]);
+  Serial.print("\t");
+  Serial.print(channels[6]);
+  Serial.print("\t");
+  Serial.print(channels[7]);
+  Serial.print("\t");
+  Serial.print(channels[8]);
+  Serial.print("\t");
+  Serial.print(channels[9]);
+  Serial.print("\t");
+  Serial.print(channels[11]);
+  Serial.print("\t");
+  Serial.println(channels[12]);
+}*/
 
 void sbusProcess() {
   static byte buffer[25];
@@ -71,4 +71,4 @@ void sbusProcess() {
       ((buffer[23] >> 1) & 0x0001) ? channels[17] = 2047: channels[17] = 0;
     }
   }
-}*/
+}
