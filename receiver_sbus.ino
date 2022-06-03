@@ -66,9 +66,21 @@ void sbusProcess() {
       channels[13] = ((buffer[18]>>7|buffer[19]<<1|buffer[20]<<9)  & 0x07FF);
       channels[14] = ((buffer[20]>>2|buffer[21]<<6)                & 0x07FF);
       channels[15] = ((buffer[21]>>5|buffer[22]<<3)                & 0x07FF);
-
       ((buffer[23])      & 0x0001) ? channels[16] = 2047: channels[16] = 0;
       ((buffer[23] >> 1) & 0x0001) ? channels[17] = 2047: channels[17] = 0;
+
+      channels[0] = map(channels[0], 180, 1820, 0, 1000);
+      channels[1] = map(channels[1], 180, 1820, 0, 1000);
+      channels[2] = map(channels[2], 180, 1820, 0, 1000);
+      channels[3] = map(channels[3], 180, 1820, 0, 1000);
+      channels[4] = map(channels[4], 180, 1820, 0, 1000);
+      channels[5] = map(channels[5], 180, 1820, 0, 1000);
+      if (channels[0] < 0) channels[0] = 0;
+      if (channels[1] < 0) channels[1] = 0;
+      if (channels[2] < 0) channels[2] = 0;
+      if (channels[3] < 0) channels[3] = 0;
+      if (channels[4] < 0) channels[4] = 0;
+      if (channels[5] < 0) channels[5] = 0;
     }
   }
 }

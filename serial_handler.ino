@@ -29,10 +29,10 @@ void serialHandler() {
         pid_d_gain_roll  = EEPROM.read(5);
         }
        else{
-        esc_1 = 1000;
-        esc_2 = 1000;
-        esc_3 = 1000;
-        esc_4 = 1000;
+        esc_1 = 0;
+        esc_2 = 0;
+        esc_3 = 0;
+        esc_4 = 0;
         }
       }
 
@@ -143,19 +143,39 @@ void serialHandler() {
 }
 
 void serialLinkHandler(){
-  
-  if(loop_status == 2){
-    if (mode_blinker++ > 125){ 
-      digitalWrite(PC13, !digitalRead(PC13));
-      mode_blinker = 0;}
 
-    if (debug_mode_delay++ > 4){ 
+  // DEBUG MODE
+  if(loop_status == 2){
+    if (mode_blinker++ > 125)
+      { 
+      digitalWrite(PC13, !digitalRead(PC13));
+      mode_blinker = 0;
+      }
+
+    if (debug_mode_delay++ > 9){ 
       Serial.print("{\"PD\":");
       Serial.print(angle_pitch_output);
       Serial.print(",\"RD\":");
       Serial.print(angle_roll_output);
-      Serial.println("}");
-      debug_mode_delay = 0;}
+      Serial.print(",\"CH\":\"");
+      Serial.print(channels[0]);
+      Serial.print(",");
+      Serial.print(channels[1]);
+      Serial.print(",");
+      Serial.print(channels[2]);
+      Serial.print(",");
+      Serial.print(channels[3]);
+      Serial.print(",");
+      Serial.print(channels[4]);
+      Serial.print(",");
+      Serial.print(channels[5]);
+      Serial.print(",");
+      Serial.print(channels[6]);
+      Serial.print(",");
+      Serial.print(channels[7]);
+      Serial.println("\"}");
+      debug_mode_delay = 0;
+      }
       
     if (esc_1 < 1000) esc_1 = 1000;
     if (esc_2 < 1000) esc_2 = 1000;
@@ -167,37 +187,21 @@ void serialLinkHandler(){
     if (esc_4 > 2000) esc_4 = 2000;
 
     }
-  
+
+  // TELEMETRY MODE
   else if(loop_status == 3){
-    if (mode_blinker++ > 125){ 
+    if (mode_blinker++ > 125)
+      { 
       digitalWrite(PC13, !digitalRead(PC13));
-      mode_blinker = 0;}
-  
-    if (debug_mode_delay++ > 4){ 
-      Serial.print("{\"PD\":");
-      Serial.print(angle_pitch_output);
-      Serial.print(",\"RD\":");
-      Serial.print(angle_roll_output);
-      Serial.println("}");
-      debug_mode_delay = 0;}
- 
+      mode_blinker = 0;
+      }
+
       esc_1 = 1000;
       esc_2 = 1000;
       esc_3 = 1000;
-      esc_4 = 1000;}
-  }
-
-
-
-
-
-
-
-
-
-
-
-
+      esc_4 = 1000;
+    }
+}
 
 char * get_value_char( const char *s)
 {   
