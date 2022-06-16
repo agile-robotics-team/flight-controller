@@ -21,17 +21,13 @@ void calcAngles(){
   angle_pitch = angle_pitch * 0.95 + angle_pitch_acc * 0.05;     
   angle_roll  = angle_roll  * 0.95 + angle_roll_acc  * 0.05; 
 
-  angle_pitch_output = -1 * kalmanX.update(angle_pitch_acc, angle_pitch);
+  angle_pitch_output = -1 * kalmanX.update(angle_pitch_acc, angle_pitch) - 0.10;
   if(angle_pitch_output>=90) angle_pitch_output = 90;
   else if (angle_pitch_output<=-90) angle_pitch_output = -90;
 
-  angle_roll_output = kalmanY.update(angle_roll_acc, angle_roll) - 0.70;
+  angle_roll_output = kalmanY.update(angle_roll_acc, angle_roll) - 1.05;
   if(angle_roll_output>=90) angle_roll_output = 90;
   else if (angle_roll_output<=-90) angle_roll_output = -90;
-}
-
-void calcTemprature() {
-  temperature = (float) temperature_raw / 340 + 36.53;
 }
 
 void readIMU() {
@@ -46,6 +42,7 @@ void readIMU() {
   gyro_y_raw      = HWire.read() << 8 | HWire.read();
   gyro_z_raw      = HWire.read() << 8 | HWire.read();
   temperature_raw = HWire.read() << 8 | HWire.read();
+  temperature = (float) temperature_raw / 340 + 36.53;
 }
 
 void calibrateGyro(){                                              

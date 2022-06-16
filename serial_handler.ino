@@ -6,17 +6,15 @@ static byte byte_counter = 0;
 char        end_marker = '\n';
 char        read_byte;
 
-
-
 void serialHandler() {
   serialRead();
   if(new_data == true){
 
     // CHANGING MODE 
-    if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'F' && serial_rx_buffer[2] == 'M'){
+    /*if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'F' && serial_rx_buffer[2] == 'M'){
       digitalWrite(PC13, HIGH);
-      loop_status = atoi(get_value_char(serial_rx_buffer));
-      if(loop_status == 1){
+      mode_status = atoi(get_value_char(serial_rx_buffer));
+      if(mode_status == 1){
         esc_1 = 1100;
         esc_2 = 1100;
         esc_3 = 1100;
@@ -29,17 +27,17 @@ void serialHandler() {
         pid_d_gain_roll  = EEPROM.read(5);
         }
        else{
-        esc_1 = 0;
-        esc_2 = 0;
-        esc_3 = 0;
-        esc_4 = 0;
+        esc_1 = 1000;
+        esc_2 = 1000;
+        esc_3 = 1000;
+        esc_4 = 1000;
         }
-      }
+      }*/
 
     // GET MODE
-    else if(serial_rx_buffer[0] == 'G' && serial_rx_buffer[1] == 'M'){
+    if(serial_rx_buffer[0] == 'G' && serial_rx_buffer[1] == 'M'){
       Serial.print("{\"GM\":");
-      Serial.print(loop_status);
+      Serial.print(mode_status);
       Serial.println("}"); }
     
     // GET ANGLES
@@ -101,106 +99,45 @@ void serialHandler() {
     
     // AFTER THIS LINE NEEDS DEBUG MODE
     // ESC SET
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '1' && loop_status == 2) esc_1 = 1000 + atoi(get_value_char(serial_rx_buffer));
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '2' && loop_status == 2) esc_2 = 1000 + atoi(get_value_char(serial_rx_buffer));
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '3' && loop_status == 2) esc_3 = 1000 + atoi(get_value_char(serial_rx_buffer));
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '4' && loop_status == 2) esc_4 = 1000 + atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '1' && mode_status == 1) esc_1 = 1000 + atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '2' && mode_status == 1) esc_2 = 1000 + atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '3' && mode_status == 1) esc_3 = 1000 + atoi(get_value_char(serial_rx_buffer));
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'E' && serial_rx_buffer[2] == '4' && mode_status == 1) esc_4 = 1000 + atoi(get_value_char(serial_rx_buffer));
 
     // EEPROM WRITE PID
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'P' && loop_status == 2){
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'P' && mode_status == 1){
       EEPROM.write(0, atoi(get_value_char(serial_rx_buffer)));
       pid_p_gain_pitch = (float)(EEPROM.read(0) / 100.0);
       }
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'I' && loop_status == 2){
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'I' && mode_status == 1){
       EEPROM.write(1, atoi(get_value_char(serial_rx_buffer)));
       pid_i_gain_pitch = (float)(EEPROM.read(1) / 100000.0);
       }
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'D' && loop_status == 2){
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'P' && serial_rx_buffer[2] == 'D' && mode_status == 1){
       EEPROM.write(2, atoi(get_value_char(serial_rx_buffer)));
       pid_d_gain_pitch = (float)(EEPROM.read(2));
       }
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'P' && loop_status == 2){
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'P' && mode_status == 1){
       EEPROM.write(3, atoi(get_value_char(serial_rx_buffer)));
       pid_p_gain_roll = (float)(EEPROM.read(3) / 100.0);
       }
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'I' && loop_status == 2){
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'I' && mode_status == 1){
       EEPROM.write(4, atoi(get_value_char(serial_rx_buffer)));
       pid_i_gain_roll = (float)(EEPROM.read(4) / 100000.0);
       }
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'D' && loop_status == 2){
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'R' && serial_rx_buffer[2] == 'D' && mode_status == 1){
       EEPROM.write(5, atoi(get_value_char(serial_rx_buffer)));
       pid_d_gain_roll = (float)(EEPROM.read(5));
       }
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'P' && loop_status == 2) EEPROM.write(6, atoi(get_value_char(serial_rx_buffer)));
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'I' && loop_status == 2) EEPROM.write(7, atoi(get_value_char(serial_rx_buffer)));
-    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'D' && loop_status == 2) EEPROM.write(8, atoi(get_value_char(serial_rx_buffer)) / 100000);
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'P' && mode_status == 1) EEPROM.write(6, atoi(get_value_char(serial_rx_buffer)));
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'I' && mode_status == 1) EEPROM.write(7, atoi(get_value_char(serial_rx_buffer)));
+    else if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'Y' && serial_rx_buffer[2] == 'D' && mode_status == 1) EEPROM.write(8, atoi(get_value_char(serial_rx_buffer)) / 100000);
     
     // RETURN ERRORS BACK
     else Serial.println(serial_rx_buffer);
   
   new_data = false;
   }
-}
-
-void serialLinkHandler(){
-
-  // DEBUG MODE
-  if(loop_status == 2){
-    if (mode_blinker++ > 125)
-      { 
-      digitalWrite(PC13, !digitalRead(PC13));
-      mode_blinker = 0;
-      }
-
-    if (debug_mode_delay++ > 9){ 
-      Serial.print("{\"PD\":");
-      Serial.print(angle_pitch_output);
-      Serial.print(",\"RD\":");
-      Serial.print(angle_roll_output);
-      Serial.print(",\"CH\":\"");
-      Serial.print(channels[0]);
-      Serial.print(",");
-      Serial.print(channels[1]);
-      Serial.print(",");
-      Serial.print(channels[2]);
-      Serial.print(",");
-      Serial.print(channels[3]);
-      Serial.print(",");
-      Serial.print(channels[4]);
-      Serial.print(",");
-      Serial.print(channels[5]);
-      Serial.print(",");
-      Serial.print(channels[6]);
-      Serial.print(",");
-      Serial.print(channels[7]);
-      Serial.println("\"}");
-      debug_mode_delay = 0;
-      }
-      
-    if (esc_1 < 1000) esc_1 = 1000;
-    if (esc_2 < 1000) esc_2 = 1000;
-    if (esc_3 < 1000) esc_3 = 1000;
-    if (esc_4 < 1000) esc_4 = 1000;
-    if (esc_1 > 2000) esc_1 = 2000;
-    if (esc_2 > 2000) esc_2 = 2000; 
-    if (esc_3 > 2000) esc_3 = 2000;
-    if (esc_4 > 2000) esc_4 = 2000;
-
-    }
-
-  // TELEMETRY MODE
-  else if(loop_status == 3){
-    if (mode_blinker++ > 125)
-      { 
-      digitalWrite(PC13, !digitalRead(PC13));
-      mode_blinker = 0;
-      }
-
-      esc_1 = 1000;
-      esc_2 = 1000;
-      esc_3 = 1000;
-      esc_4 = 1000;
-    }
 }
 
 char * get_value_char( const char *s)
@@ -220,5 +157,8 @@ void serialRead() {
     else {
     serial_rx_buffer[byte_counter] = '\0';
     byte_counter = 0;
-    new_data = true;}}
+    if (serial_rx_buffer[0] == 'c' && serial_rx_buffer[1] == 'o' && serial_rx_buffer[2] == 'd' && serial_rx_buffer[3] == 'e') new_data = false;
+    else new_data = true;
+       }
+    }
 }

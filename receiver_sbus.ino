@@ -1,35 +1,6 @@
 #define SBUS_STARTBYTE 0x0F
 #define SBUS_ENDBYTE   0x00
 
-/*void loop() {
-  
-  sbusProcess();
-  
-  Serial.print(channels[0]);
-  Serial.print("\t");
-  Serial.print(channels[1]);
-  Serial.print("\t");
-  Serial.print(channels[2]);
-  Serial.print("\t");
-  Serial.print(channels[3]);
-  Serial.print("\t");
-  Serial.print(channels[4]);
-  Serial.print("\t");
-  Serial.print(channels[5]);
-  Serial.print("\t");
-  Serial.print(channels[6]);
-  Serial.print("\t");
-  Serial.print(channels[7]);
-  Serial.print("\t");
-  Serial.print(channels[8]);
-  Serial.print("\t");
-  Serial.print(channels[9]);
-  Serial.print("\t");
-  Serial.print(channels[11]);
-  Serial.print("\t");
-  Serial.println(channels[12]);
-}*/
-
 void sbusProcess() {
   static byte buffer[25];
   static byte buffer_index = 0;
@@ -75,12 +46,25 @@ void sbusProcess() {
       channels[3] = map(channels[3], 180, 1820, 0, 1000);
       channels[4] = map(channels[4], 180, 1820, 0, 1000);
       channels[5] = map(channels[5], 180, 1820, 0, 1000);
+      channels[6] = map(channels[6], 180, 1820, 0, 1000);
+      channels[7] = map(channels[7], 180, 1820, 0, 1000);
+      channels[8] = map(channels[8], 180, 1820, 0, 1000);
       if (channels[0] < 0) channels[0] = 0;
       if (channels[1] < 0) channels[1] = 0;
       if (channels[2] < 0) channels[2] = 0;
       if (channels[3] < 0) channels[3] = 0;
       if (channels[4] < 0) channels[4] = 0;
       if (channels[5] < 0) channels[5] = 0;
+      if (channels[6] < 0) channels[6] = 0;
+      if (channels[7] < 0) channels[7] = 0;
+      if (channels[8] < 0) channels[8] = 0;
     }
   }
+  if (channels[4] < 300) mode_status = 0;
+  else if ((channels[4] > 300) && channels[4] < 700) mode_status = 1;
+  else mode_status = 2;
+  
+  if (channels[5] < 300) telemetry_status = 0;
+  else if ((channels[5] > 300) && channels[5] < 700) telemetry_status = 1;
+  else telemetry_status = 2;
 }
