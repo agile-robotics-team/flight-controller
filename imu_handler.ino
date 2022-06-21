@@ -21,11 +21,11 @@ void calcAngles(){
   angle_pitch = angle_pitch * 0.95 + angle_pitch_acc * 0.05;     
   angle_roll  = angle_roll  * 0.95 + angle_roll_acc  * 0.05; 
 
-  angle_pitch_output = -1 * kalmanX.update(angle_pitch_acc, angle_pitch) - 0.10;
+  angle_pitch_output = -1 * kalmanX.update(angle_pitch_acc, angle_pitch) + 0.18;
   if(angle_pitch_output>=90) angle_pitch_output = 90;
   else if (angle_pitch_output<=-90) angle_pitch_output = -90;
 
-  angle_roll_output = kalmanY.update(angle_roll_acc, angle_roll) - 1.05;
+  angle_roll_output = kalmanY.update(angle_roll_acc, angle_roll) - 1.62;
   if(angle_roll_output>=90) angle_roll_output = 90;
   else if (angle_roll_output<=-90) angle_roll_output = -90;
 }

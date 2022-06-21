@@ -12,7 +12,7 @@ float   temperature;
 
 int     telemetry_status = 0;
 int     telemetry_delay = 0;
-int     mode_status = 3;
+int     mode_status = 0;
 int     mode_blinker = 0;
 
 long  acc_total_vector;
@@ -49,7 +49,13 @@ TwoWire HWire(2, I2C_FAST_MODE);
 volatile int channels[18];
 
 void setup() {
-  
+  pid_p_gain_pitch = 0.8;
+  pid_i_gain_pitch = 0.000001;
+  pid_d_gain_pitch = 40.0;
+  pid_p_gain_roll  = pid_p_gain_pitch;
+  pid_i_gain_roll  = pid_i_gain_pitch;
+  pid_d_gain_roll  = pid_d_gain_pitch;
+
   // init communcation ways
   pinMode(PC13, OUTPUT);
   Serial2.begin(100000, SERIAL_8E2);
@@ -76,13 +82,7 @@ void setup() {
   pid_p_gain_roll  = EEPROM.read(3) / 100.0;
   pid_i_gain_roll  = EEPROM.read(4) / 100000.0;
   pid_d_gain_roll  = EEPROM.read(5);*/
-  
-  pid_p_gain_pitch = 1.5;
-  pid_i_gain_pitch = 0.0;
-  pid_d_gain_pitch = 47.0;
-  pid_p_gain_roll  = pid_p_gain_pitch;
-  pid_i_gain_roll  = pid_i_gain_pitch;
-  pid_d_gain_roll  = pid_d_gain_pitch;
+ 
 }
 
 void loop() {
@@ -126,10 +126,10 @@ void loop() {
     if (esc_2 < 1100) esc_2 = 1100;
     if (esc_3 < 1100) esc_3 = 1100;
     if (esc_4 < 1100) esc_4 = 1100;
-    if (esc_1 > 1500) esc_1 = 1500;
-    if (esc_2 > 1500) esc_2 = 1500; 
-    if (esc_3 > 1500) esc_3 = 1500;
-    if (esc_4 > 1500) esc_4 = 1500;
+    if (esc_1 > 1400) esc_1 = 1400;
+    if (esc_2 > 1400) esc_2 = 1400; 
+    if (esc_3 > 1400) esc_3 = 1400;
+    if (esc_4 > 1400) esc_4 = 1400;
     }
   
   // EMITTING ESC SIGNALS
