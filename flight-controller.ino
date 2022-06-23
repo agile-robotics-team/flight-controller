@@ -2,7 +2,8 @@
 #include <EEPROM.h>
 #include "KalmanFilter.h"
 
-int     loop_timer, val;
+int32_t loop_timer, cache_timer;
+int     val;
 int16_t gyro_x_raw, gyro_y_raw, gyro_z_raw;
 long    gyro_x_cal, gyro_y_cal, gyro_z_cal;
 float   gyro_x, gyro_y, gyro_z;
@@ -23,8 +24,8 @@ float angle_pitch_output, angle_roll_output, angle_yaw_output;
 volatile float pid_error_temp;
 float pid_i_mem_pitch, pid_pitch_setpoint = 0, pid_output_pitch, pid_last_pitch_d_error;
 float pid_i_mem_roll,  pid_roll_setpoint = 0, pid_output_roll,  pid_last_roll_d_error;
-volatile double pid_p_gain_pitch, pid_i_gain_pitch, pid_d_gain_pitch;
-volatile double pid_p_gain_roll, pid_i_gain_roll,pid_d_gain_roll;
+double pid_p_gain_pitch, pid_i_gain_pitch, pid_d_gain_pitch;
+double pid_p_gain_roll, pid_i_gain_roll, pid_d_gain_roll;
 int   pid_max_roll  =  400; //Maximum output of the PID-controller (+/-).
 int   pid_max_pitch =  400; //Maximum output of the PID-controller (+/-).
 
@@ -49,9 +50,11 @@ TwoWire HWire(2, I2C_FAST_MODE);
 volatile int channels[18];
 
 void setup() {
-  pid_p_gain_pitch = 0.8;
-  pid_i_gain_pitch = 0.000001;
-  pid_d_gain_pitch = 40.0;
+  
+  
+  pid_p_gain_pitch = 0.0;
+  pid_i_gain_pitch = 0.0;
+  pid_d_gain_pitch = 0.0;
   pid_p_gain_roll  = pid_p_gain_pitch;
   pid_i_gain_roll  = pid_i_gain_pitch;
   pid_d_gain_roll  = pid_d_gain_pitch;
@@ -82,14 +85,14 @@ void setup() {
   pid_p_gain_roll  = EEPROM.read(3) / 100.0;
   pid_i_gain_roll  = EEPROM.read(4) / 100000.0;
   pid_d_gain_roll  = EEPROM.read(5);*/
- 
+  
+  loop_timer = micros() + 4000;
 }
 
 void loop() {
 
   // PREPARING SYSTEM FOR CURRENT LOOP
   calcAngles();
-  sbusProcess();
   calcPid();
   
   // BOOT MODE
@@ -126,10 +129,10 @@ void loop() {
     if (esc_2 < 1100) esc_2 = 1100;
     if (esc_3 < 1100) esc_3 = 1100;
     if (esc_4 < 1100) esc_4 = 1100;
-    if (esc_1 > 1400) esc_1 = 1400;
-    if (esc_2 > 1400) esc_2 = 1400; 
-    if (esc_3 > 1400) esc_3 = 1400;
-    if (esc_4 > 1400) esc_4 = 1400;
+    if (esc_1 > 2000) esc_1 = 2000;
+    if (esc_2 > 2000) esc_2 = 2000; 
+    if (esc_3 > 2000) esc_3 = 2000;
+    if (esc_4 > 2000) esc_4 = 2000;
     }
   
   // EMITTING ESC SIGNALS
@@ -140,8 +143,11 @@ void loop() {
   TIMER4_BASE->CNT = 5000; 
 
   // Serial.println(loop_timer - micros());
+  sbusProcess();
   serialHandler();
   telemetryHandler();
-  while (loop_timer > micros());
-  loop_timer = micros() + 4000;
+
+  if ((int32_t)micros() - loop_timer > 0) Serial.println((int32_t) micros() - loop_timer);
+  while ((int32_t)loop_timer > micros());
+  loop_timer = (int32_t) micros() + 4000;
 }

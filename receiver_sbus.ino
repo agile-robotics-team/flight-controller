@@ -46,9 +46,10 @@ void sbusProcess() {
       channels[3] = map(channels[3], 180, 1820, 0, 1000);
       channels[4] = map(channels[4], 180, 1820, 0, 1000);
       channels[5] = map(channels[5], 180, 1820, 0, 1000);
-      channels[6] = map(channels[6], 180, 1820, 0, 1000);
-      channels[7] = map(channels[7], 180, 1820, 0, 1000);
+      channels[6] = map(channels[6], 172, 1820, 0, 1000);
+      channels[7] = map(channels[7], 172, 1820, 0, 1000);
       channels[8] = map(channels[8], 180, 1820, 0, 1000);
+      
       if (channels[0] < 0) channels[0] = 0;
       if (channels[1] < 0) channels[1] = 0;
       if (channels[2] < 0) channels[2] = 0;
@@ -58,6 +59,11 @@ void sbusProcess() {
       if (channels[6] < 0) channels[6] = 0;
       if (channels[7] < 0) channels[7] = 0;
       if (channels[8] < 0) channels[8] = 0;
+
+      pid_p_gain_pitch = (float)channels[6] / 200.0;
+      pid_d_gain_pitch = (float)channels[7] / 10.0;
+      pid_p_gain_roll = pid_p_gain_pitch;
+      pid_d_gain_roll = pid_d_gain_pitch;
     }
   }
   if (channels[4] < 300) mode_status = 0;
