@@ -1,33 +1,27 @@
 void calcAngles(){
   readIMU();
-  
-  gyro_x = gyro_x_raw - gyro_x_cal;
-  gyro_y = gyro_y_raw - gyro_y_cal;
-  gyro_z = gyro_z_raw - gyro_z_cal;
 
-  angle_yaw_output = (angle_yaw_output * 0.7) + (((float)gyro_z / 65.5) * 0.3);      //Gyro pid input is deg/sec.
+  // pid calculations
+  gyro_pitch  = gyro_pitch_raw  - gyro_pitch_cal;
+  gyro_roll   = gyro_roll_raw   - gyro_roll_cal;
+  gyro_yaw    = gyro_yaw_raw    - gyro_yaw_cal;
   
-  angle_pitch += gyro_x * 0.0000611;
-  angle_roll  += gyro_y * 0.0000611;            
-  angle_pitch += angle_roll * sin(gyro_z * 0.000001066);
-  angle_roll -= angle_pitch * sin(gyro_z * 0.000001066);
-  
-  acc_total_vector = sqrt((acc_x*acc_x)+(acc_y*acc_y)+(acc_z*acc_z));
-  
-  angle_pitch_acc = asin((float)acc_y/acc_total_vector)*  57.296;
-  angle_roll_acc  = asin((float)acc_x/acc_total_vector)* -57.296;
+  gyro_roll_input  = (gyro_roll_input   * 0.7) + (((float)gyro_roll   / 65.5) * 0.3);   //Gyro pid input is deg/sec.
+  gyro_pitch_input = (gyro_pitch_input  * 0.7) + (((float)gyro_pitch  / 65.5) * 0.3);   //Gyro pid input is deg/sec.
+  gyro_yaw_input   = (gyro_yaw_input    * 0.7) + (((float)gyro_yaw    / 65.5) * 0.3);       //Gyro pid input is deg/sec.
 
-  // fix drift
-  angle_pitch = angle_pitch * 0.95 + angle_pitch_acc * 0.05;     
-  angle_roll  = angle_roll  * 0.95 + angle_roll_acc  * 0.05; 
-
-  angle_pitch_output = -1 * kalmanX.update(angle_pitch_acc, angle_pitch) + 0.18;
-  if(angle_pitch_output>=90) angle_pitch_output = 90;
-  else if (angle_pitch_output<=-90) angle_pitch_output = -90;
-
-  angle_roll_output = kalmanY.update(angle_roll_acc, angle_roll) - 1.62;
-  if(angle_roll_output>=90) angle_roll_output = 90;
-  else if (angle_roll_output<=-90) angle_roll_output = -90;
+  // angle calculations
+  angle_pitch += gyro_pitch * 0.0000611;
+  angle_roll  += gyro_roll  * 0.0000611;            
+  angle_pitch += angle_roll  * sin(gyro_yaw * 0.000001066);
+  angle_roll  -= angle_pitch * sin(gyro_yaw * 0.000001066);
+  acc_total_vector = sqrt((acc_pitch*acc_pitch)+(acc_roll*acc_roll)+(acc_yaw*acc_yaw));
+  if (abs(acc_pitch) < acc_total_vector) angle_pitch_acc = asin((float)acc_pitch / acc_total_vector) * 57.296;
+  if (abs(acc_roll)  < acc_total_vector) angle_roll_acc  = asin((float)acc_roll  / acc_total_vector) * 57.296; 
+  angle_pitch = (angle_pitch * 0.96 + angle_pitch_acc * 0.04);     
+  angle_roll  = (angle_roll  * 0.96 + angle_roll_acc  * 0.04);
+  angle_pitch_output  = kalmanPitch.update(angle_pitch_acc + 0.2, angle_pitch + 0.2);
+  angle_roll_output   = kalmanRoll.update (angle_roll_acc + 1.7,  angle_roll + 1.7);
 }
 
 void readIMU() {
@@ -35,35 +29,40 @@ void readIMU() {
   HWire.write(MPU6050_READ_ADDRESS);
   HWire.endTransmission();
   HWire.requestFrom(MPU6050_ADDRESS, 14);
-  acc_x           = HWire.read() << 8 | HWire.read();
-  acc_y           = HWire.read() << 8 | HWire.read();
-  acc_z           = HWire.read() << 8 | HWire.read();
-  gyro_x_raw      = HWire.read() << 8 | HWire.read();
-  gyro_y_raw      = HWire.read() << 8 | HWire.read();
-  gyro_z_raw      = HWire.read() << 8 | HWire.read();
-  temperature_raw = HWire.read() << 8 | HWire.read();
+  acc_roll         = HWire.read() << 8 | HWire.read();
+  acc_pitch          = HWire.read() << 8 | HWire.read();
+  acc_yaw           = HWire.read() << 8 | HWire.read();
+  temperature_raw   = HWire.read() << 8 | HWire.read();
+  gyro_pitch_raw    = HWire.read() << 8 | HWire.read();
+  gyro_roll_raw     = HWire.read() << 8 | HWire.read();
+  gyro_yaw_raw      = HWire.read() << 8 | HWire.read();
+  gyro_roll_raw *= -1;
   temperature = (float) temperature_raw / 340 + 36.53;
 }
 
 void calibrateGyro(){                                              
-  for (int cal_int = 0; cal_int < 2000 ; cal_int ++){                  
+  for (int cal_int = 0; cal_int < 1000 ; cal_int ++){                  
     if(cal_int % 100 == 0) Serial.println(".");                            
     readIMU();                                             
-    gyro_x_cal += gyro_x_raw;                                           
-    gyro_y_cal += gyro_y_raw;                                              
-    gyro_z_cal += gyro_z_raw;                                              
-    delay(3);                                                          
+    gyro_pitch_cal  += gyro_pitch_raw;                                           
+    gyro_roll_cal   += gyro_roll_raw;                                              
+    gyro_yaw_cal    += gyro_yaw_raw;                                              
+    delay(4);                                                          
   }
-  gyro_x_cal /= 2000;                                                  
-  gyro_y_cal /= 2000;                                                  
-  gyro_z_cal /= 2000;
-  //Serial.print(gyro_x_cal);
-  //Serial.print("\t");
-  //Serial.print(gyro_y_cal);
-  //Serial.print("\t");
-  //Serial.print(gyro_z_cal);
-  //Serial.print("\t");
-  
+  gyro_pitch_cal /= 1000;                                                  
+  gyro_roll_cal /= 1000;                                                  
+  gyro_yaw_cal /= 1000;
+  Serial.print(gyro_pitch_cal);
+  Serial.print("\t");
+  Serial.print(gyro_roll_cal);
+  Serial.print("\t");
+  Serial.println(gyro_yaw_cal);
+
+  /*gyro_pitch_cal = -280;
+  gyro_roll_cal = 102;
+  gyro_yaw_cal = 97;*/
+     
+
 }
 
 void initIMU() {

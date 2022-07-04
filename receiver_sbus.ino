@@ -60,15 +60,18 @@ void sbusProcess() {
       if (channels[7] < 0) channels[7] = 0;
       if (channels[8] < 0) channels[8] = 0;
 
-      pid_p_gain_pitch = (float)channels[6] / 200.0;
-      pid_d_gain_pitch = (float)channels[7] / 10.0;
-      pid_p_gain_roll = pid_p_gain_pitch;
-      pid_d_gain_roll = pid_d_gain_pitch;
+      //pid_p_gain_pitch = (float)channels[6] / 200.0;
+      //pid_d_gain_pitch = (float)channels[7] / 10.0;
+      //pid_p_gain_roll = pid_p_gain_pitch;
+      //pid_d_gain_roll = pid_d_gain_pitch;
     }
   }
+
+  mode_status = 0;
   if (channels[4] < 300) mode_status = 0;
   else if ((channels[4] > 300) && channels[4] < 700) mode_status = 1;
-  else mode_status = 2;
+  else if (channels[4] > 700) mode_status = 2;
+  else mode_status = 0;
   
   if (channels[5] < 300) telemetry_status = 0;
   else if ((channels[5] > 300) && channels[5] < 700) telemetry_status = 1;

@@ -10,30 +10,6 @@ void serialHandler() {
   serialRead();
   if(new_data == true){
 
-    // CHANGING MODE 
-    /*if(serial_rx_buffer[0] == 'S' && serial_rx_buffer[1] == 'F' && serial_rx_buffer[2] == 'M'){
-      digitalWrite(PC13, HIGH);
-      mode_status = atoi(get_value_char(serial_rx_buffer));
-      if(mode_status == 1){
-        esc_1 = 1100;
-        esc_2 = 1100;
-        esc_3 = 1100;
-        esc_4 = 1100;
-        pid_p_gain_pitch = EEPROM.read(0) / 100.0;
-        pid_i_gain_pitch = EEPROM.read(1) / 100000.0;
-        pid_d_gain_pitch = EEPROM.read(2);
-        pid_p_gain_roll  = EEPROM.read(3) / 100.0;
-        pid_i_gain_roll  = EEPROM.read(4) / 100000.0;
-        pid_d_gain_roll  = EEPROM.read(5);
-        }
-       else{
-        esc_1 = 1000;
-        esc_2 = 1000;
-        esc_3 = 1000;
-        esc_4 = 1000;
-        }
-      }*/
-
     // GET MODE
     if(serial_rx_buffer[0] == 'G' && serial_rx_buffer[1] == 'M'){
       Serial.print("{\"GM\":");

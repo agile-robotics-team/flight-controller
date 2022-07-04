@@ -13,7 +13,7 @@ void telemetryHandler(){
     if (telemetry_delay % 7  == 0){
       angle_respond_delay++;
       
-      if     (angle_respond_delay == 1){
+      /*if     (angle_respond_delay == 1){
       Serial.print("{\"PD\":");
       Serial.print(angle_pitch_output);
       Serial.println("}");}
@@ -21,15 +21,29 @@ void telemetryHandler(){
       else if(angle_respond_delay == 2){
       Serial.print("{\"RD\":");
       Serial.print(angle_roll_output);
-      Serial.println("}");}
+      Serial.println("}");}*/
+      
+      Serial.print(" 100 -100 ");
+      Serial.print(angle_pitch_output);
+      Serial.print(" ");
+      Serial.print(angle_roll_output);
+      Serial.print(" ");
+      Serial.print(angle_pitch);
+      Serial.print(" ");
+      Serial.print(angle_roll);
+      Serial.print(" ");
+      Serial.print(angle_pitch_acc);
+      Serial.print(" ");
+      Serial.println(angle_roll_acc);
+      }
       
       if     (angle_respond_delay == 2) angle_respond_delay = 0;
       
       }
 
-    if (telemetry_delay % 35  == 0){
+    /*if (telemetry_delay % 27  == 0){
       sensor_respond_delay++;
-      if (sensor_respond_delay == 4) sensor_respond_delay = 0;
+      if (sensor_respond_delay == 8) sensor_respond_delay = 0;
       
       if(sensor_respond_delay == 0){
       Serial.print("{\"TEM1\":");
@@ -51,7 +65,27 @@ void telemetryHandler(){
         Serial.print(pid_d_gain_pitch);
         Serial.println("}");
         };
-    }
+      if(sensor_respond_delay == 4){
+        Serial.print("{\"ESC1\":");
+        Serial.print(esc_1);
+        Serial.println("}");
+        };
+      if(sensor_respond_delay == 5){
+        Serial.print("{\"ESC2\":");
+        Serial.print(esc_2);
+        Serial.println("}");
+        };
+      if(sensor_respond_delay == 6){
+        Serial.print("{\"ESC3\":");
+        Serial.print(esc_3);
+        Serial.println("}");
+        };
+      if(sensor_respond_delay == 7){
+        Serial.print("{\"ESC4\":");
+        Serial.print(esc_4);
+        Serial.println("}");
+        };
+    }*/
 
       
     /*if (telemetry_delay % 50  == 0){
@@ -109,8 +143,8 @@ void telemetryHandler(){
       Serial.print("{\"GRD\":");
       Serial.print(EEPROM.read(5));
       Serial.println("}");
-      }*/
-    }
+      }
+    }*/
     
   // TELEMETRY FAST MODE 
   else if(telemetry_status == 2){
